@@ -17,6 +17,6 @@ app.use(cookieParser())
 app.use("/api/auth", authRoutes)
 app.use("/api/links", linkRoutes)
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Server started on port ${port}!`)
 })
