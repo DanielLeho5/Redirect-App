@@ -118,7 +118,8 @@ const getLinkList = async (req, res) => {
         const links = await Link.find({userId: userData.userId})
         if (links.length === 0) {return res.status(400).json({success: false, message: "No links found for this user!"})}
 
-        linkArray = links.map((link) => link.redirectTo)
+        const baseUrl = `${req.protocol}://${req.get('host')}/`;
+        linkArray = links.map((link) => (baseUrl + link._id))
         
         return res.status(200).json({success: true, message: "Links listed successfully!", linkArray})
     } catch (error) {
