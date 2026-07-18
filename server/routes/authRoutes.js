@@ -8,6 +8,20 @@ router.post("/login", login)
 router.post("/refresh-token", refreshAccessToken)
 router.post("/logout", logout)
 
+router.get("/is-auth", authMiddleware, (req, res) => {
+	return res.status(200).json({
+		success: true,
+		message: "User is logged in!",
+		user: {
+			userId: req.userData.userId,
+			name: req.userData.name,
+			email: req.userData.email,
+			role: req.userData.role,
+			isVerified: req.userData.isVerified
+		}
+	})
+})
+
 router.post("/send-verify-email", authMiddleware, sendVerifyOtp)
 router.post("/verify-email", authMiddleware, verifyEmail)
 

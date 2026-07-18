@@ -11,9 +11,10 @@ const register = async (req, res) => {
         const {name, email, password} = req.body || {}
 
         if (!name || !email || !password) {return res.status(400).json({success: false, message: "Name, email and password are mandatory!"})}
+        if (password.length < 5) {return res.status(400).json({success: false, message: "Password too short!"})}
 
         const userAlreadyExists = await User.findOne({email})
-        if (userAlreadyExists) {return res.status(405).json({success: false, messsage: "User already registered with this email!"})}
+        if (userAlreadyExists) {return res.status(400).json({success: false, message: "User already registered with this email!"})}
 
         const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -37,7 +38,7 @@ const login = async (req, res) => {
         if (!user) {return res.status(400).json({success: false, messsage: "Invalid credentials!"})}
 
         const passwordsMatch = await bcrypt.compare(password, user.password)
-        if (!passwordsMatch) {return res.status(401).json({success: false, message: "Invalid credentials!"})}
+        if (!passwordsMatch) {return res.status(400).json({success: false, message: "Invalid credentials!"})}
 
         // set cookies
         const accessToken = createAccessToken(user)
@@ -48,7 +49,16 @@ const login = async (req, res) => {
 
         setAuthCookie(res, accessToken, refreshToken)
 
-        return res.status(200).json({success: true, message: "Logged in successfully!"})
+        return res.status(200).json({
+            success: true,
+            message: "Logged in successfully!",
+            user: {
+                userId: user._id,
+                name: user.name,
+                email: user.email,
+                isVerified: user.isVerified
+            }
+        })
         
     } catch (error) {
         return res.status(500).json({success: false, message: "Something went wrong!", error})
@@ -73,9 +83,18 @@ const refreshAccessToken = async (req, res) => {
         user.refreshToken = await bcrypt.hash(newRefreshToken, 10)
         await user.save()
 
-        setAuthCookie(res, accessToken, refreshToken)
+        setAuthCookie(res, accessToken, newRefreshToken)
 
-        return res.status(200).json({success: true, message: "Access token refreshed successfully!"})
+        return res.status(200).json({
+            success: true,
+            message: "Access token refreshed successfully!",
+            user: {
+                userId: user._id,
+                name: user.name,
+                email: user.email,
+                isVerified: user.isVerified
+            }
+        })
     } catch (error) {
         return res.status(500).json({success: false, message: "Something went wrong!", error})
     }
@@ -184,6 +203,7 @@ const resetPassword = async (req, res) => {
         const {otp, newPassword, userEmail} = req.body || {}
         if (!otp) {return res.status(400).json({success: false, message: "No otp provided!"})}
         if (!newPassword) {return res.status(400).json({success: false, message: "No new password provided!"})}
+        if (password.length < 5) {return res.status(400).json({success: false, message: "Password too short!"})}
         if (!userEmail) {return res.status(400).json({success: false, message: "No email provided!"})}
 
         const user = await User.findOne({email: userEmail})

@@ -37,6 +37,7 @@ const getOneLink = async (req, res) => {
 const createLink = async (req, res) => {
     try {
         const userData = req.userData
+        if (!userData.isVerified) {return res.status(400).json({success: false, message: "Please verify your email address!"})}
         const {name, redirectTo} = req.body || {}
 
         if (!name || !redirectTo) {return res.status(400).json({success: false, message: "Name and redirectTo (url) are mandatory!"})}
