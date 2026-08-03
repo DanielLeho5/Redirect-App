@@ -7,6 +7,7 @@ import CreateNewLinkPopup from "../components/CreateNewLinkPopup"
 import api from "../lib/api"
 
 import {Html5QrcodeScanner} from "html5-qrcode";
+import jsQR from "jsqr";
 
 export default function Dashboard() {
 
@@ -46,13 +47,21 @@ export default function Dashboard() {
         )
 
     const scannerRef = useRef(null);
+    const scanIntervalRef = useRef(null);
     const startScanner = () => {
         if (!scannerRef.current) {
             scannerRef.current = new Html5QrcodeScanner(
                 "reader",
                 {
-                    fps: 20,
-                    qrbox: { width: 250, height: 250 }
+                    fps: 10,
+                    qrbox: { width: 260, height: 260 },
+                    aspectRatio: 1.0,
+                    showTorchButtonIfSupported: true,
+                    videoConstraints: {
+                        facingMode: { ideal: "environment" },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
                 },
                 false
             );
@@ -61,8 +70,50 @@ export default function Dashboard() {
         scannerRef.current.render(onScanSuccess, onScanError);
     };
 
+    const tryDecodeFrame = () => {
+        try {
+            const video = document.querySelector('#reader video');
+            if (!video || video.readyState !== 4) return;
+
+            const w = video.videoWidth || 640;
+            const h = video.videoHeight || 480;
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, w, h);
+            const imageData = ctx.getImageData(0, 0, w, h);
+
+            // try normal decode
+            let code = jsQR(imageData.data, imageData.width, imageData.height);
+            if (code && code.data) {
+                onScanSuccess(code.data);
+                return;
+            }
+
+            // invert and retry
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                imageData.data[i] = 255 - imageData.data[i];
+                imageData.data[i + 1] = 255 - imageData.data[i + 1];
+                imageData.data[i + 2] = 255 - imageData.data[i + 2];
+            }
+            const invertedCode = jsQR(imageData.data, imageData.width, imageData.height);
+            if (invertedCode && invertedCode.data) {
+                onScanSuccess(invertedCode.data);
+                return;
+            }
+        } catch (err) {
+            console.error('frame decode error', err);
+        }
+    };
+
     
     const onScanSuccess = (data) => {
+        // clear any background frame-decoding attempts
+        if (scanIntervalRef.current) {
+            clearInterval(scanIntervalRef.current);
+            scanIntervalRef.current = null;
+        }
         setSearch(data.split("/").pop())
 
         scannerRef.current
@@ -73,15 +124,63 @@ export default function Dashboard() {
         });
     }
 
-    const onScanError = () => {}
+    const handleStartScanning = async () => {
+        // Request camera permission first so we can give clearer feedback
+        const constraints = {
+            video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        };
+
+        try {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                toast.error('Camera API not supported in this browser.')
+                return
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia(constraints)
+            // immediately stop the stream (we only wanted to prompt/verify permission)
+            stream.getTracks().forEach(t => t.stop())
+            setIsScanning(true)
+        } catch (err) {
+            console.error('camera permission error', err)
+            const name = err?.name || ''
+            if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+                toast.error('Camera permission denied. Allow camera access in your browser settings and retry.')
+            } else if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+                toast.error('No suitable camera found. Try a different device.')
+            } else {
+                toast.error(err?.message || 'Unable to access camera')
+            }
+        }
+    }
+
+    const onScanError = (err) => {
+        // handle permission/errors during scanner lifecycle
+        if (err && (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError')) {
+            toast.error('Camera permission denied. Allow camera access in your browser settings and retry.')
+            scannerRef.current?.clear().catch(() => {})
+            setIsScanning(false)
+        }
+    }
 
     useEffect(() => {
         if (!isScanning) return
 
         startScanner()
+        // start a background attempt to decode frames (normal + inverted)
+        if (!scanIntervalRef.current) {
+            scanIntervalRef.current = setInterval(tryDecodeFrame, 800);
+        }
 
         return () => {
            scannerRef.current?.clear().catch(console.error)
+           if (scanIntervalRef.current) {
+               clearInterval(scanIntervalRef.current)
+               scanIntervalRef.current = null
+           }
         }
     }, [isScanning])
 
@@ -102,7 +201,7 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <button 
-                    onClick={() => setIsScanning(true)}
+                    onClick={handleStartScanning}
                     className="bg-blue-600 p-2.5 h-10 aspect-square rounded-lg text-white font-bold hover:bg-blue-700 cursor-pointer flex items-center justify-center">
                     <img src={assets.camera} className="w-4"/>
                 </button>
