@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import { assets } from '../assets/assets'
 import { AppContext } from '../context/AppContext'
 import api from '../lib/api'
@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 
 const DeletePopup = ({link, setIsDeleting, setIsLinkUpdated}) => {
 
-    const {backendUrl} = useContext(AppContext)
+    const { } = useContext(AppContext)
 
     const [title, setTitle] = useState("")
 
@@ -20,7 +20,7 @@ const DeletePopup = ({link, setIsDeleting, setIsLinkUpdated}) => {
                 toast.success(data.message)
                 setTitle("")
                 setIsDeleting(false)
-                setIsLinkUpdated(prev => !prev)
+                setIsLinkUpdated(prev => prev + 1)
             } else {
                 toast.error(data.message)
             }

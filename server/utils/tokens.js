@@ -22,7 +22,7 @@ const createRefreshToken = (user) => {
 const cookieOtpions = {
     secure: process.env.NODE_ENV === "production",
     httpOnly: true,
-    sameSite: "strict"
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax"
 }
 
 const setAuthCookie = (res, accessToken, refreshToken) => {

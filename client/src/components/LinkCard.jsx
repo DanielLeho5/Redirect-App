@@ -54,7 +54,8 @@ export default function LinkCard({link, setIsLinkUpdated}) {
     useEffect(() => {
         const renderQR = async () => {
             try {
-                const url = "https://redirect-app.duckdns.org" + "/api/links/redirect/" + link._id
+                const baseUrl = backendUrl || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000")
+                const url = baseUrl + "/api/links/redirect/" + link._id
                 const qrDataUrl = await QRCode.toDataURL(url)
                 setQr(qrDataUrl)
             } catch (error) {
@@ -79,7 +80,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                 {!isEditingTitle ? 
                 <div className="flex min-w-0 gap-3 items-center flex-1 flex-wrap">
                     <p className="text-xl font-semibold min-w-0 text-nowrap">{link.name}</p>
-                    <button onClick={() => setIsEditingTitle(prev => true)} className="bg-blue-500 p-1.5 rounded-xl hover:bg-blue-600 cursor-pointer shrink-0">
+                    <button onClick={() => setIsEditingTitle(true)} className="bg-blue-500 p-1.5 rounded-xl hover:bg-blue-600 cursor-pointer shrink-0">
                         <img src={assets.pen} className="w-5" />
                     </button>
                 </div>
@@ -92,7 +93,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                     <button onClick={onSaveTitleHandler} className="bg-green-600 p-1.5 rounded-xl hover:bg-green-700 cursor-pointer shrink-0">
                         <img src={assets.check} className="w-5" />
                     </button>
-                    <button onClick={() => setIsEditingTitle(prev => false)}  className="bg-gray-600 p-1.5 rounded-xl hover:bg-gray-700 cursor-pointer shrink-0">
+                    <button onClick={() => setIsEditingTitle(false)}  className="bg-gray-600 p-1.5 rounded-xl hover:bg-gray-700 cursor-pointer shrink-0">
                         <img src={assets.plus} className="w-5 rotate-45" />
                     </button>
                 </div>
@@ -120,7 +121,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                     <button onClick={onSaveUrlHandler} className="bg-green-600 p-1.5 rounded-xl hover:bg-green-700 cursor-pointer shrink-0">
                         <img src={assets.check} className="w-5" />
                     </button>
-                    <button onClick={() => setIsEditingUrl(prev => false)} className="bg-gray-600 p-1.5 rounded-xl hover:bg-gray-700 cursor-pointer shrink-0">
+                    <button onClick={() => setIsEditingUrl(false)} className="bg-gray-600 p-1.5 rounded-xl hover:bg-gray-700 cursor-pointer shrink-0">
                         <img src={assets.plus} className="w-5 rotate-45" />
                     </button>
                 </div>
@@ -133,10 +134,10 @@ export default function LinkCard({link, setIsLinkUpdated}) {
             className="mb-2 max-w-full min-w-0 truncate text-blue-700 cursor-pointer">{link._id}</p>
             <button 
             onClick={() => {
-                const link = document.createElement("a")
-                link.href = qr
-                link.download = `${link.name || "qr-code"}.png`
-                link.click()
+                const qrLink = document.createElement("a")
+                qrLink.href = qr
+                qrLink.download = `${link.name || "qr-code"}.png`
+                qrLink.click()
             }}
             className="bg-blue-600 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-blue-700 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
                 <img src={assets.download} className="w-5"/>

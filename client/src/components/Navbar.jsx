@@ -2,8 +2,6 @@ import { assets } from "../assets/assets"
 import { useNavigate } from "react-router-dom"
 import { AppContext } from "../context/AppContext"
 import { useContext } from "react"
-import axios from "axios"
-import { toast } from "react-toastify"
 
 export function Navbar() {
 

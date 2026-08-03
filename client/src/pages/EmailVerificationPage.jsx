@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import { assets } from "../assets/assets"
 import api from '../lib/api'
 import { toast } from 'react-toastify'
@@ -9,7 +9,7 @@ const EmailVerificationPage = () => {
 
     const [otp, setOtp] = useState("")
     const navigate = useNavigate()
-    const {initializeAuth, setUserData} = useContext(AppContext)
+    const {setUserData} = useContext(AppContext)
 
     const sendEmailHandler = async (e) => {
         e.preventDefault()

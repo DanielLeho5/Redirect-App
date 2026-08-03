@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { assets } from '../assets/assets'
 import api from '../lib/api'
 import { toast } from 'react-toastify'

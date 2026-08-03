@@ -1,4 +1,3 @@
-import axios from "axios";
 import { assets } from "../assets/assets";
 import { useContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -14,7 +13,7 @@ export default function AuthForm({type}) {
 
     const navigate = useNavigate()
 
-    const {backendUrl, setIsLoggedIn, setUserData} = useContext(AppContext)
+    const {setIsLoggedIn, setUserData} = useContext(AppContext)
     
     const onSubmitHandler = async (e) => {
         e.preventDefault()

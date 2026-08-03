@@ -203,7 +203,7 @@ const resetPassword = async (req, res) => {
         const {otp, newPassword, userEmail} = req.body || {}
         if (!otp) {return res.status(400).json({success: false, message: "No otp provided!"})}
         if (!newPassword) {return res.status(400).json({success: false, message: "No new password provided!"})}
-        if (password.length < 5) {return res.status(400).json({success: false, message: "Password too short!"})}
+        if (newPassword.length < 5) {return res.status(400).json({success: false, message: "Password too short!"})}
         if (!userEmail) {return res.status(400).json({success: false, message: "No email provided!"})}
 
         const user = await User.findOne({email: userEmail})

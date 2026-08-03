@@ -186,6 +186,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (authReady && isLoggedIn) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             getLinks()
         }
     }, [authReady, isLoggedIn, linkUpdated])

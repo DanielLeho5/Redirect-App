@@ -1,6 +1,8 @@
 import axios from "axios"
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL
+const configuredBackendUrl = import.meta.env.VITE_BACKEND_URL?.trim()
+const fallbackBackendUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"
+const backendUrl = configuredBackendUrl || fallbackBackendUrl
 
 const api = axios.create({
     baseURL: backendUrl,

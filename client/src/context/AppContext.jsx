@@ -9,7 +9,9 @@ export const AppContextProvider = (props) => {
 
     const navigate = useNavigate()
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL
+    const configuredBackendUrl = import.meta.env.VITE_BACKEND_URL?.trim()
+    const fallbackBackendUrl = typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"
+    const backendUrl = configuredBackendUrl || fallbackBackendUrl
     const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [userData, setUserData] = useState(null)
     const [authReady, setAuthReady] = useState(false)
@@ -22,7 +24,7 @@ export const AppContextProvider = (props) => {
 
     const logoutHandler = async () => {
         try {
-            const {data} = await api.post(backendUrl + "/api/auth/logout")
+            const {data} = await api.post("/api/auth/logout")
 
             if (data.success) {
                 toast.success("Logged out successfully!")
