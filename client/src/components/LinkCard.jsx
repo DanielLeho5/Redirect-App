@@ -65,7 +65,14 @@ export default function LinkCard({link, setIsLinkUpdated}) {
             }
 
             const ndef = new window.NDEFReader()
-            await ndef.write(shareUrl)
+            await ndef.write({
+                records: [
+                    {
+                        recordType: "url",
+                        data: shareUrl,
+                    },
+                ],
+            })
 
             toast.success("Wrote NFC tag")
         } catch (error) {
