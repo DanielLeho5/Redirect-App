@@ -10,6 +10,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
 
     const {backendUrl} = useContext(AppContext)
     const [qr, setQr] = useState()
+    const [isWritingNfc, setIsWritingNfc] = useState(false)
     const shareUrl = `${backendUrl || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000")}/api/links/redirect/${link._id}`
 
     const [isEditingTitle, setIsEditingTitle] = useState(false)
@@ -53,6 +54,8 @@ export default function LinkCard({link, setIsLinkUpdated}) {
     }
 
     const onWriteNfcHandler = async () => {
+        setIsWritingNfc(true)
+
         try {
             if (typeof window === "undefined" || !window.isSecureContext) {
                 toast.error("NFC writing requires HTTPS or localhost")
@@ -77,6 +80,8 @@ export default function LinkCard({link, setIsLinkUpdated}) {
             toast.success("Wrote NFC tag")
         } catch (error) {
             toast.error(error?.message || "Could not write NFC tag")
+        } finally {
+            setIsWritingNfc(false)
         }
     }
 
@@ -156,8 +161,10 @@ export default function LinkCard({link, setIsLinkUpdated}) {
             <div className="flex flex-wrap gap-3">
                 <button
                     onClick={onWriteNfcHandler}
-                    className="bg-emerald-600 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-emerald-700 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
-                    <p>Write NFC</p>
+                    disabled={isWritingNfc}
+                    className={`px-6 sm:px-8 h-10 rounded-lg text-white font-bold flex justify-center items-center gap-3 w-full sm:w-auto ${isWritingNfc ? "bg-emerald-500 cursor-wait" : "bg-emerald-600 hover:bg-emerald-700 cursor-pointer"}`}>
+                    <span className={`h-2.5 w-2.5 rounded-full ${isWritingNfc ? "bg-white animate-pulse" : "bg-white/80"}`} />
+                    <p>{isWritingNfc ? "Writing NFC..." : "Write NFC"}</p>
                 </button>
                 <button 
                     onClick={() => {
