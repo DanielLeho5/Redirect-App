@@ -68,7 +68,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
             await ndef.write({
                 records: [
                     {
-                        recordType: "url",
+                        recordType: "absolute-url",
                         data: shareUrl,
                     },
                 ],
