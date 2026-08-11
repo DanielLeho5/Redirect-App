@@ -191,10 +191,10 @@ export default function Dashboard() {
         }
     }, [authReady, isLoggedIn, linkUpdated])
 
-    return <div className='flex flex-col px-10 lg:px-20 gap-5 items-center'>
-        <div className="flex flex-wr justify-between items-center w-full lg:flex-row gap-3 pt-10 sm:flex-nowrap flex-wrap">
+    return <div className='flex flex-col sm:px-10 lg:px-20 gap-5 items-center'>
+        <div className="flex px-5 justify-between items-center w-full lg:flex-row gap-3 pt-10 sm:flex-nowrap flex-wrap">
             <div className="flex w-full gap-3">
-                <div className="bg-white rounded-lg flex items-center pl-3 pr-1 gap-3 w-full h-10">
+                <div className="bg-white border-gray-300 border rounded-lg flex items-center pl-3 pr-1 gap-3 w-full h-10">
                     <img src={assets.search_gray} className="w-5"/>
                     <input onChange={e => setSearch(e.target.value)} value={search} type="text" className="w-full outline-none bg-transparent text-gray-800" placeholder="Search ..."/>
                     <div onClick={() => setSearch("")} className="aspect-square flex items-center justify-center rounded-full active:bg-gray-300 hover:bg-gray-200 cursor-pointer p-2 transition-colors duration-300">
@@ -216,13 +216,13 @@ export default function Dashboard() {
         </div>
         {isCreating && <CreateNewLinkPopup setIsCreating={setIsCreating} onCreated={getLinks}/>} 
         {filteredLinks.length > 0 ?
-            <div className="grid lg:grid-cols-2 gap-5 grid-cols-1 w-full">
+            <div className="grid xl:grid-cols-2 gap-3 grid-cols-1 w-full">
                 {filteredLinks.map((link) => (
                     <LinkCard setIsLinkUpdated={setIsLinkUpdated} key={link._id} link={link}/>
                 ))}
             </div>
             :
-            <p className="w-full flex justify-center text-3xl text-white/70 font-semibold">No links found ...</p>
+            <p className="w-full flex justify-center text-3xl text-gray-500 font-semibold">No links found ...</p>
         }
         {isScanning && <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
             <div className="bg-white rounded-xl p-6">

@@ -87,7 +87,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
     }, [shareUrl])
 
 
-    return <div className="bg-gray-100 w-full overflow-hidden rounded-xl p-5 flex gap-5 flex-col md:flex-row border border-gray-300 shadow-sm">
+    return <div className="bg-white w-full overflow-hidden sm:rounded-xl p-5 flex gap-5 flex-col md:flex-row border border-gray-300 shadow-sm">
         <div className="flex flex-col justify-center items-center gap-2 shrink-0">
             <img src={qr} className="w-40 max-w-full" />
             <div className="flex items-center justify-center gap-2">
@@ -105,9 +105,8 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                     </button>
                 </div>
                 :
-                <div className="flex items-center flex-wrap justify-center gap-2">
-                    <div className="bg-gray-200 p-2 rounded-lg flex items-center px-3 gap-3">
-                        <img src={assets.hash} className="w-4"/>
+                <div className="flex items-center justify-center gap-2 w-full">
+                    <div className="bg-gray-200 p-2 rounded-lg flex items-center px-3 gap-3 w-full">
                         <input onChange={e => setTitle(e.target.value)} value={title} type="text" className="w-full outline-none bg-transparent text-gray-800" placeholder="Title of the link"/>
                     </div>
                     <button onClick={onSaveTitleHandler} className="bg-green-600 p-1.5 rounded-xl hover:bg-green-700 cursor-pointer shrink-0">
@@ -118,10 +117,6 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                     </button>
                 </div>
                 }
-                <button onClick={() => {setIsDeleting(true)}} className="bg-red-200 p-1.5 rounded-xl hover:bg-red-300 cursor-pointer shrink-0 text-red-800 px-5 border border-red-300">
-                    Delete
-                </button>
-                {isDeleting && <DeletePopup link={link} setIsLinkUpdated={setIsLinkUpdated} setIsDeleting={setIsDeleting}/>}
             </div>
             <div className="flex flex-wrap items-center gap-2 min-w-0">
                 <p className="text-lg shrink-0">Redirect to: </p>
@@ -133,10 +128,9 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                     </button>
                 </div>
                 :
-                <div className="flex items-center justify-center gap-2">
-                    <div className="bg-gray-200 p-2 rounded-lg flex items-center px-3 gap-3">
-                        <img src={assets.hash} className="w-4"/>
-                        <input onChange={e => setUrl(e.target.value)} value={url} type="text" className="w-full outline-none bg-transparent text-gray-800" placeholder="Title of the link"/>
+                <div className="flex items-center justify-center gap-2 w-full">
+                    <div className="bg-gray-200 p-2 rounded-lg flex items-center px-3 gap-3 w-full">
+                        <input onChange={e => setUrl(e.target.value)} value={url} type="text" className="w-full outline-none bg-transparent text-gray-800" placeholder="url"/>
                     </div>
                     <button onClick={onSaveUrlHandler} className="bg-green-600 p-1.5 rounded-xl hover:bg-green-700 cursor-pointer shrink-0">
                         <img src={assets.check} className="w-5" />
@@ -153,22 +147,25 @@ export default function LinkCard({link, setIsLinkUpdated}) {
             }}  
             className="mb-2 max-w-full min-w-0 truncate text-blue-700 cursor-pointer">{link._id}</p>
             <div className="flex flex-wrap gap-3">
-            <button
-            onClick={onWriteNfcHandler}
-            className="bg-emerald-600 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-emerald-700 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
-                <p>Write NFC</p>
-            </button>
-            <button 
-            onClick={() => {
-                const qrLink = document.createElement("a")
-                qrLink.href = qr
-                qrLink.download = `${link.name || "qr-code"}.png`
-                qrLink.click()
-            }}
-            className="bg-blue-600 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-blue-700 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
-                <img src={assets.download} className="w-5"/>
-                <p>Download</p>
-            </button>
+                <button
+                    onClick={onWriteNfcHandler}
+                    className="bg-emerald-600 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-emerald-700 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
+                    <p>Write NFC</p>
+                </button>
+                <button 
+                    onClick={() => {
+                        const qrLink = document.createElement("a")
+                        qrLink.href = qr
+                        qrLink.download = `${link.name || "qr-code"}.png`
+                        qrLink.click()
+                    }}
+                    className="bg-blue-600 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-blue-700 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
+                    <p>Download</p>
+                </button>
+                <button onClick={() => {setIsDeleting(true)}} className="bg-red-400 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-red-500 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
+                    Delete
+                </button>
+                {isDeleting && <DeletePopup link={link} setIsLinkUpdated={setIsLinkUpdated} setIsDeleting={setIsDeleting}/>}
             </div>
         </div>
     </div>

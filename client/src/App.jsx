@@ -30,7 +30,7 @@ function App() {
     <>
       <Navbar/>
       {isSidebarOpen && <Sidebar/>}
-      <div className='w-full min-h-screen bg-linear-90 from-blue-400 to-blue-200'>
+      <div className='w-full min-h-screen bg-gray-100'>
         <Routes>
           <Route
             path="/"
