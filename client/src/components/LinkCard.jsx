@@ -10,6 +10,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
 
     const {backendUrl} = useContext(AppContext)
     const [qr, setQr] = useState()
+    const shareUrl = `${backendUrl || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000")}/api/links/redirect/${link._id}`
 
     const [isEditingTitle, setIsEditingTitle] = useState(false)
     const [title, setTitle] = useState(link.name)
@@ -51,12 +52,31 @@ export default function LinkCard({link, setIsLinkUpdated}) {
         }
     }
 
+    const onWriteNfcHandler = async () => {
+        try {
+            if (typeof window === "undefined" || !window.isSecureContext) {
+                toast.error("NFC writing requires HTTPS or localhost")
+                return
+            }
+
+            if (!("NDEFReader" in window)) {
+                toast.error("NFC writing is not supported in this browser")
+                return
+            }
+
+            const ndef = new window.NDEFReader()
+            await ndef.write(shareUrl)
+
+            toast.success("Wrote NFC tag")
+        } catch (error) {
+            toast.error(error?.message || "Could not write NFC tag")
+        }
+    }
+
     useEffect(() => {
         const renderQR = async () => {
             try {
-                const baseUrl = backendUrl || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3000")
-                const url = baseUrl + "/api/links/redirect/" + link._id
-                const qrDataUrl = await QRCode.toDataURL(url)
+                const qrDataUrl = await QRCode.toDataURL(shareUrl)
                 setQr(qrDataUrl)
             } catch (error) {
                 console.error(error)
@@ -64,7 +84,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
         }
 
         renderQR()
-    }, [backendUrl, link._id])
+    }, [shareUrl])
 
 
     return <div className="bg-gray-100 w-full overflow-hidden rounded-xl p-5 flex gap-5 flex-col md:flex-row border border-gray-300 shadow-sm">
@@ -128,10 +148,16 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                 }
             </div>
             <p onClick={() => {
-                navigator.clipboard.writeText(backendUrl + "/api/links/redirect/" + link._id);
+                navigator.clipboard.writeText(shareUrl);
                 toast.success("Copied to clipboard")
             }}  
             className="mb-2 max-w-full min-w-0 truncate text-blue-700 cursor-pointer">{link._id}</p>
+            <div className="flex flex-wrap gap-3">
+            <button
+            onClick={onWriteNfcHandler}
+            className="bg-emerald-600 px-6 sm:px-8 h-10 rounded-lg text-white font-bold hover:bg-emerald-700 cursor-pointer flex justify-center items-center gap-3 w-full sm:w-auto">
+                <p>Write NFC</p>
+            </button>
             <button 
             onClick={() => {
                 const qrLink = document.createElement("a")
@@ -143,6 +169,7 @@ export default function LinkCard({link, setIsLinkUpdated}) {
                 <img src={assets.download} className="w-5"/>
                 <p>Download</p>
             </button>
+            </div>
         </div>
     </div>
 }
