@@ -8,7 +8,7 @@ export function Navbar() {
     const {isLoggedIn, authReady, userData, toggleSidebar, logoutHandler} = useContext(AppContext)
     const navigate = useNavigate()
 
-    return <nav className="w-full z-10 flex bg-blue-900 shadow-lg items-center justify-between py-4 px-8 sticky top-0 gap-3">
+    return <nav className="w-full z-10 flex bg-red-900 shadow-lg items-center justify-between py-4 px-8 sticky top-0 gap-3">
         <button className="flex gap-5 items-center cursor-pointer" onClick={() => navigate("/")}>
             <img src={assets.qr_logo} className="w-15" />
             <h1 className="text-2xl font-bold text-white text-nowrap sm:flex items-center hidden">QR Code Redirect App</h1>
